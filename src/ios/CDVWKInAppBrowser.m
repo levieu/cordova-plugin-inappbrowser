@@ -651,8 +651,19 @@ static CDVWKInAppBrowser* instance = nil;
                 url = @"";
             }
         }
+
+        NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
+        NSHTTPCookie *cookie;
+        for (cookie in [storage cookies])
+        {
+            NSString *name = [cookie valueForKey:@"name"];
+            NSString *value = [cookie valueForKey:@"value"];
+            NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
+            [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
+        }
+
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
+                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url, @"cookies":[cookieList componentsJoinedByString:@";"]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];

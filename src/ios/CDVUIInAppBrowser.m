@@ -568,9 +568,20 @@ static CDVUIInAppBrowser* instance = nil;
 {
     if (self.callbackId != nil) {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
+
+        NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
+        NSHTTPCookie *cookie;
+        for (cookie in [storage cookies])
+        {
+            NSString *name = [cookie valueForKey:@"name"];
+            NSString *value = [cookie valueForKey:@"value"];
+            NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
+            [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
+        }
+
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
+                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url, @"cookies":[cookieList componentsJoinedByString:@";"]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
