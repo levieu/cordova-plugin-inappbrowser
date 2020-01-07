@@ -654,6 +654,7 @@ static CDVWKInAppBrowser* instance = nil;
 
         NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
         NSHTTPCookie *cookie;
+        NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
         for (cookie in [storage cookies])
         {
             NSString *name = [cookie valueForKey:@"name"];
