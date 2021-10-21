@@ -173,10 +173,9 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                     inAppWebView.requestFocus();
                     callbackContext.sendPluginResult(pluginResult);
-                    return;
                 }
             }
-
+            else{
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
                 t = SELF;
@@ -267,6 +266,7 @@ public class InAppBrowser extends CordovaPlugin {
                     callbackContext.sendPluginResult(pluginResult);
                 }
             });
+        }
         }
         else if (action.equals("loadNewUrl")) {
             final String newUrl = args.getString(0);
