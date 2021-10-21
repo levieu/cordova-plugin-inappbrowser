@@ -253,6 +253,17 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             });
         }
+        else if (action.equals("loadNewUrl")) {
+            final String newUrl = args.getString(0);
+            if (inAppWebView != null){
+                if (!newUrl.startsWith("http") && !newUrl.startsWith("file:")) {
+                    inAppWebView.loadUrl("http://" + newUrl);
+                } else {
+                    inAppWebView.loadUrl(newUrl);
+                }
+                inAppWebView.requestFocus();
+            }
+        }
         else if (action.equals("close")) {
             closeDialog();
         }
