@@ -102,7 +102,7 @@
         },
     };
 
-    module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
+    exports.open = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
         if (window.frames && window.frames[strWindowName]) {
             var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
@@ -127,7 +127,7 @@
         return iab;
     };
 
-    module.exports = function (strUrl) {
+    exports.loadNewUrl = function (strUrl) {
         strUrl = urlutil.makeAbsolute(strUrl);
         exec(null, null, 'InAppBrowser', 'loadNewUrl', [strUrl]);
     }
