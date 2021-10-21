@@ -126,4 +126,9 @@
         exec(cb, cb, 'InAppBrowser', 'open', [strUrl, strWindowName, strWindowFeatures]);
         return iab;
     };
+
+    module.exports = function (strUrl) {
+        strUrl = urlutil.makeAbsolute(strUrl);
+        exec(null, null, 'InAppBrowser', 'loadNewUrl', [strUrl]);
+    }
 })();
