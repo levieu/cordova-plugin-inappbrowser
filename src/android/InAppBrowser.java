@@ -163,21 +163,6 @@ public class InAppBrowser extends CordovaPlugin {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
 
-            final String targetCIE = args.getString(1);
-            if (targetCIE != null && targetCIE.equals("CIE")){
-                if (inAppWebView != null){
-                    if (!url.startsWith("http") && !url.startsWith("file:")) {
-                        inAppWebView.loadUrl("http://" + url);
-                    } else {
-                        inAppWebView.loadUrl(url);
-                    }
-                    inAppWebView.requestFocus();
-                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "OK");
-                    pluginResult.setKeepCallback(true);
-                    callbackContext.sendPluginResult(pluginResult);
-                }
-            }
-            else{
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
                 t = SELF;
@@ -268,18 +253,6 @@ public class InAppBrowser extends CordovaPlugin {
                     callbackContext.sendPluginResult(pluginResult);
                 }
             });
-        }
-        }
-        else if (action.equals("loadNewUrl")) {
-            final String newUrl = args.getString(0);
-            if (inAppWebView != null){
-                if (!newUrl.startsWith("http") && !newUrl.startsWith("file:")) {
-                    inAppWebView.loadUrl("http://" + newUrl);
-                } else {
-                    inAppWebView.loadUrl(newUrl);
-                }
-                inAppWebView.requestFocus();
-            }
         }
         else if (action.equals("close")) {
             closeDialog();

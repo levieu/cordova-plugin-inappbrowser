@@ -95,11 +95,7 @@
             } else {
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
-        },
-        loadNewUrl: function (strUrl) {
-            strUrl = urlutil.makeAbsolute(strUrl);
-            exec(null, null, 'InAppBrowser', 'loadNewUrl', [strUrl]);
-        },
+        }
     };
 
     module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {

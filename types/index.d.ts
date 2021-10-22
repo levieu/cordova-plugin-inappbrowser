@@ -78,7 +78,6 @@ interface InAppBrowser extends Window {
      */
     insertCSS(css: { code: string } | { file: string }, callback: () => void): void;
 
-    loadNewUrl(strUrl:string): void;
 }
 
 type InAppBrowserEventListenerOrEventListenerObject = InAppBrowserEventListener | InAppBrowserEventListenerObject;
