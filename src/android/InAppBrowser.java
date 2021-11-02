@@ -1316,6 +1316,17 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 }
             }
+            else if(url.contains("OpenApp")) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", BEFORELOAD);
+                    obj.put("url", url);
+                    sendUpdate(obj, true);
+                    override = true;
+                } catch(Exception e) {
+                    LOG.e(LOG_TAG, "Error sending beforeload for " + url + ": " + e.toString());
+                }
+            }
 
             if (useBeforeload) {
                 this.waitForBeforeload = true;
