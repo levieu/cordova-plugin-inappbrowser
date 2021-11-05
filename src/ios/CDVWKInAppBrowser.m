@@ -562,17 +562,17 @@ static CDVWKInAppBrowser* instance = nil;
         NSLog(@"url--> %@", URL.absoluteString);
         
         //[[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
-        if ([[UIApplication sharedApplication] canOpenURL:url] == NO){
+        if ([[UIApplication sharedApplication] canOpenURL:URL] == NO){
             NSLog(@"cannot open url--> %@", URL.absoluteString);
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                          messageAsDictionary:@{@"type":@"loaderror", @"url":[url absoluteString], @"code": @"-100", @"message": @"No app Cieid"}];
+                                                          messageAsDictionary:@{@"type":@"loaderror", @"url":[URL absoluteString], @"code": @"-100", @"message": @"No app Cieid"}];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         }
         else{
             [self openInSystem:URL];
         }
-        
+
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
     }
