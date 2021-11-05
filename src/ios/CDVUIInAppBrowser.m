@@ -231,6 +231,10 @@ static CDVUIInAppBrowser* instance = nil;
     if (!browserOptions.hidden) {
         [self show:nil];
     }
+
+    //custom agent for cie login
+    self.inAppBrowserViewController.webView.customUserAgent = @"Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1";
+    //[self.inAppBrowserViewController.webView.configuration.preferences setValue:@YES forKey:@"developerExtrasEnabled"];
 }
 
 - (void)show:(CDVInvokedUrlCommand*)command
@@ -543,6 +547,33 @@ static CDVUIInAppBrowser* instance = nil;
         [theWebView stopLoading];
         [self openInSystem:url];
         shouldStart = NO;
+    }
+    if ([[ url scheme] isEqualToString:@"CIEID"] || [[ url scheme] isEqualToString:@"cieid"]) {
+        [theWebView stopLoading];
+        NSString *compURLString = (url.absoluteString == nil ? [NSMutableString new] : [[[[ [url.absoluteString mutableCopy]
+                stringByReplacingOccurrencesOfString: @"cieid://" withString:@"CIEID://"]
+                stringByReplacingOccurrencesOfString: @"https//" withString:@"https://"]
+                stringByReplacingOccurrencesOfString: @"http//" withString:@"http://"]
+                stringByReplacingOccurrencesOfString: @"&sourceApp=" withString:@"/&sourceApp="]);
+       
+        NSURL *URL = [NSURL URLWithString:compURLString];
+        NSLog(@"url--> %@", URL.absoluteString);
+        
+        //[[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
+        [self openInSystem:URL];
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+    }
+    else if ([[ url absoluteString] containsString:@"ios.idserver.servizicie.interno.gov.it"]){
+        [theWebView stopLoading];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":[url absoluteString]}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+       
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
