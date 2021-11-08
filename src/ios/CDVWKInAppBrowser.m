@@ -552,11 +552,10 @@ static CDVWKInAppBrowser* instance = nil;
     }
     if ([[ url scheme] isEqualToString:@"CIEID"] || [[ url scheme] isEqualToString:@"cieid"]) {
         [theWebView stopLoading];
-        NSString *compURLString = (url.absoluteString == nil ? [NSMutableString new] : [[[[ [url.absoluteString mutableCopy]
+        NSString *compURLString = (url.absoluteString == nil ? [NSMutableString new] : [[[ [url.absoluteString mutableCopy]
                 stringByReplacingOccurrencesOfString: @"cieid://" withString:@"CIEID://"]
                 stringByReplacingOccurrencesOfString: @"https//" withString:@"https://"]
-                stringByReplacingOccurrencesOfString: @"http//" withString:@"http://"]
-                stringByReplacingOccurrencesOfString: @"&sourceApp=" withString:@"/&sourceApp="]);
+                stringByReplacingOccurrencesOfString: @"http//" withString:@"http://"]);
        
         NSURL *URL = [NSURL URLWithString:compURLString];
         NSLog(@"url--> %@", URL.absoluteString);
