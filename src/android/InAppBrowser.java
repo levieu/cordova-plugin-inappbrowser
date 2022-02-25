@@ -1428,6 +1428,8 @@ public class InAppBrowser extends CordovaPlugin {
                 injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
             }
 
+            String cookies = CookieManager.getInstance().getCookie(url);
+
             // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
             if (android.os.Build.VERSION.SDK_INT >= 21) {
                 CookieManager.getInstance().flush();
@@ -1443,6 +1445,7 @@ public class InAppBrowser extends CordovaPlugin {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_STOP_EVENT);
                 obj.put("url", url);
+                obj.put("cookies", cookies);
 
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
