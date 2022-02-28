@@ -545,8 +545,19 @@ static CDVWKInAppBrowser* instance = nil;
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
+        NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
+        NSHTTPCookie *cookie;
+        NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        for (cookie in [storage cookies])
+        {
+            NSString *name = [cookie valueForKey:@"name"];
+            NSString *value = [cookie valueForKey:@"value"];
+            NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
+            [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
+        }
+
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString]}];
+                                                      messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString], @"cookies":[cookieList componentsJoinedByString:@";"]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
