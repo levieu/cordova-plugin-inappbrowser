@@ -545,19 +545,8 @@ static CDVWKInAppBrowser* instance = nil;
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
-        NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
-        NSHTTPCookie *cookie;
-        NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-        for (cookie in [storage cookies])
-        {
-            NSString *name = [cookie valueForKey:@"name"];
-            NSString *value = [cookie valueForKey:@"value"];
-            NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
-            [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
-        }
-
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString], @"cookies":[cookieList componentsJoinedByString:@";"]}];
+                                                      messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
@@ -636,6 +625,7 @@ static CDVWKInAppBrowser* instance = nil;
                 url = @"";
             }
         }
+        /* OLD
         NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
         NSHTTPCookie *cookie;
         NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
@@ -646,12 +636,58 @@ static CDVWKInAppBrowser* instance = nil;
             NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
             [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
         }
-
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url, @"cookies":[cookieList componentsJoinedByString:@";"]}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        */
         
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        WKWebsiteDataStore* dataStore = [WKWebsiteDataStore defaultDataStore];
+        bool isAtLeastiOS11 = false;
+        NSMutableArray *cookieList = [NSMutableArray arrayWithObjects: nil];
+        NSLog(@"%@", url);
+        #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+            if (@available(iOS 11.0, *)) {
+                isAtLeastiOS11 = true;
+            }
+        #endif
+        if (isAtLeastiOS11) {
+            #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+                WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
+                [cookieStore getAllCookies:^(NSArray* cookies) {
+                    NSHTTPCookie* cookie;
+                    for(cookie in cookies){
+                        if(cookie.sessionOnly){
+                            //NSLog(@"%@", cookie.name);
+                            //NSLog(@"%@", cookie.value);
+                            NSString *name = [cookie valueForKey:@"name"];
+                            NSString *value = [cookie valueForKey:@"value"];
+                            NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
+                            [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
+                        }
+                    }
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                    messageAsDictionary:@{@"type":@"loadstop", @"url":url, @"cookies":[cookieList componentsJoinedByString:@";"]}];
+                    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                    
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+                }];
+            #endif
+        }else{
+            NSHTTPCookie *cookie;
+            NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+            for (cookie in [storage cookies])
+            {
+                NSString *name = [cookie valueForKey:@"name"];
+                NSString *value = [cookie valueForKey:@"value"];
+                NSArray *myStrings = [[NSArray alloc] initWithObjects:name, value, nil];
+                [cookieList addObject:([myStrings componentsJoinedByString:@"="])];
+            }
+            
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                          messageAsDictionary:@{@"type":@"loadstop", @"url":url, @"cookies":[cookieList componentsJoinedByString:@";"]}];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        }
+        
+       
     }
 }
 
