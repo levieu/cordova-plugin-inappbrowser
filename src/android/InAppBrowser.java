@@ -81,6 +81,7 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1256,7 +1257,26 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
 
-            if (url.startsWith(WebView.SCHEME_TEL)) {
+            if (url.startsWith("intent:")){
+                try {
+                    Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    if (intent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
+                        cordova.getActivity().startActivity(intent);
+                    } else {
+                        Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(
+                                Uri.parse("market://details?id=" + intent.getPackage()));
+                        if (marketIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
+                            cordova.getActivity().startActivity(marketIntent);
+                        }
+                    }
+                    override = true;
+                } catch (URISyntaxException e) {
+                    //not an intent uri
+                    LOG.e(LOG_TAG, "Not an intent " + url + ": " + e.toString());
+                }
+            }
+            else if (url.startsWith(WebView.SCHEME_TEL)) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_DIAL);
                     intent.setData(Uri.parse(url));
