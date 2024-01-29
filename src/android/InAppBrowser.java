@@ -1415,7 +1415,7 @@ public class InAppBrowser extends CordovaPlugin {
             return response;
         }
 
-        //private String lastUserAgent;
+        private String lastUserAgent;
 
         /*
          * onPageStarted fires the LOAD_START_EVENT
@@ -1444,7 +1444,7 @@ public class InAppBrowser extends CordovaPlugin {
                 edittext.setText(newloc);
             }
 
-            /*if ((newloc.contains("https://accessnoipa.mef.gov.it") || newloc.contains("https://accessnoipacoll.mef.gov.it")) && lastUserAgent != null){
+            if ((newloc.contains("https://accessnoipa.mef.gov.it") || newloc.contains("https://accessnoipacoll.mef.gov.it")) && lastUserAgent != null){
                 lastUserAgent = null;
             }
             if (newloc.contains("https://posteid.poste.it")){
@@ -1454,7 +1454,7 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.getSettings().setUserAgentString(lastUserAgent);
             }else if (newloc.contains("https://idserver.servizicie.interno.gov.it")){
                 inAppWebView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 12; SM-G973F Build/SP1A.210812.016; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/113.0.5672.163 Mobile Safari/537.");
-            }*/
+            }
 
             try {
                 JSONObject obj = new JSONObject();
