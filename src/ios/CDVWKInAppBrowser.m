@@ -548,17 +548,30 @@ static CDVWKInAppBrowser* instance = nil;
     }
     if ([[ url scheme] isEqualToString:@"CIEID"] || [[ url scheme] isEqualToString:@"cieid"]) {
         [theWebView stopLoading];
-        NSString *compURLString = (url.absoluteString == nil ? [NSMutableString new] : [[[[ [url.absoluteString mutableCopy]
+        NSString *compURLString = (url.absoluteString == nil ? [NSMutableString new] : [[[ [url.absoluteString mutableCopy]
                 stringByReplacingOccurrencesOfString: @"cieid://" withString:@"CIEID://"]
                 stringByReplacingOccurrencesOfString: @"https//" withString:@"https://"]
-                stringByReplacingOccurrencesOfString: @"http//" withString:@"http://"]
-                stringByReplacingOccurrencesOfString: @"&sourceApp=" withString:@"/&sourceApp="]);
-       
-        NSURL *URL = [NSURL URLWithString:compURLString];
+                stringByReplacingOccurrencesOfString: @"http//" withString:@"http://"]);
+        
+        //NSURL *URL = [NSURL URLWithString:compURLString];
+        
+        /* soluzione per costruire l'url con i due punti anche nel protocollo https (quello di https://ios.idserver.servizicie.interno.gov.it), con xcode 15 i due punti nel secondo protocollo vengono omessi in fase di costruzione */
+        CFStringRef cfUrlString = (__bridge CFStringRef)compURLString;
+        CFURLRef cfUrl = CFURLCreateWithString(NULL, cfUrlString, NULL);
+        NSURL *URL = (__bridge_transfer NSURL *)cfUrl;
         NSLog(@"url--> %@", URL.absoluteString);
         
         //[[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
-        [self openInSystem:URL];
+        if ([[UIApplication sharedApplication] canOpenURL:URL] == NO){
+            NSLog(@"cannot open url--> %@", URL.absoluteString);
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                                          messageAsDictionary:@{@"type":@"loaderror", @"url":[URL absoluteString], @"code": @"-100", @"message": @"No app Cieid"}];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        }
+        else{
+            [self openInSystem:URL];
+        }
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
     }
